@@ -27,5 +27,5 @@ Download all files in folder
 ```python
 from googleDriveConnector import download_files_in_folder, download_file 
 
-download_files_in_folder('0B1s-15SdhiaqSG5QcUUxQnBWNFU')
+download_files_in_folder(FOLDER ID HERE)
 ```
