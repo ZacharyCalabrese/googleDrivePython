@@ -8,7 +8,7 @@ You will also need to install the Google Client Library
 pip install --upgrade google-api-python-client
 ```
 
-To use this module you will need to setup a config file specifying the following:
+To use this module you will need to setup a config file (config.py) specifying the following and place it in the same directory as googleDriveConnector.py:
 ```python
 # https://developers.google.com/drive/web/scopes
 SCOPES = 'DESIRED API SCOPES' 
