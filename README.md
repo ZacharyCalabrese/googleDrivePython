@@ -20,12 +20,32 @@ Download specific file
 ```python
 from googleDriveConnector import download_file 
 
-download_file(FILE ID HERE)
+download_file('FILE ID HERE')
 ```
 
 Download all files in folder
 ```python
 from googleDriveConnector import download_files_in_folder
 
-download_files_in_folder(FOLDER ID HERE)
+download_files_in_folder('FOLDER ID HERE')
 ```
+
+Delete specific file
+```python
+from googleDriveConnector import delete_file
+
+delete_file('FILE ID')
+```
+
+Move file from one folder to another
+```python
+from googleDriveConnector import move_file_to_folder
+
+move_file_to_folder('FILE ID HERE', 'DESTINATION FOLDER ID')
+```
+
+Upload file
+```python
+from googleDriveConenctor import push_file_to_drive
+
+push_file_to_drive('ABSOLUTE PATH AND FILE NAME', 'DESIRED TITLE AND EXTENSION', 'DESCRIPTION', 'DESTINATION FOLDER ID')
