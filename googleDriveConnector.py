@@ -22,7 +22,8 @@ def get_credentials():
     Notice: If you are having trouble accessing dirve it may be that the credentials
     stored are for a user account that does have access to the specified file / folder
 
-    Returns: the obtained credentials
+    Returns:
+        The returned credentials
     """
 
     home_dir = os.path.expanduser('~')
@@ -46,6 +47,13 @@ def get_credentials():
     return credentials
 
 def setup_service():
+    """
+    Sets up a service by authorizing credentials and establishing a http connection
+
+    Returns:
+        Connected service instance
+    """
+
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('drive', 'v2', http=http)
@@ -54,6 +62,14 @@ def setup_service():
 def get_filename(service, file_id):
     """
     Return the title of the referenced file as it appears on Google Drive
+
+    Args:
+        service: Service instance
+        file_id (string): Id of file to be downloaded
+
+    Returns:
+        title (string): String version of file title
+        None: If and error occurs on fetching file title
     """
 
     try:
@@ -70,15 +86,22 @@ def download_file(file_id, destination_folder = ""):
     Download a Drive file's content to the local filesystem.
         
     Args:
-    file_id: ID of the Drive file that will downloaded.
+        file_id (string): ID of the Drive file that will downloaded
+        destination_folder (string): Folder path on source machine where
+            file is to be downloaded
+
+    Returns:
+        bool: True if successfully downloaded, False if not
     """
 
     service = setup_service()
     filename = get_filename(service, file_id)
+
     if len(destination_folder) > 0:
         local_fd = open(destination_folder + "/" + filename, "w+")
     else:
         local_fd = open(filename, "w+")    
+
     request = service.files().get_media(fileId=file_id)
     media_request = http.MediaIoBaseDownload(local_fd, request)
                     
@@ -87,15 +110,26 @@ def download_file(file_id, destination_folder = ""):
             download_progress, done = media_request.next_chunk()
         except errors.HttpError, error:
             print 'An error occurred: %s' % error
-            return
+            return False
         if download_progress:
             print 'Download Progress: %d%%' % int(download_progress.progress() * 100)
         if done:
             print 'Download Complete'
-            return
-    return service
+            return True
 
 def download_files_in_folder(folder_id, destination_folder = ""):
+    """
+    Download all files in a folder to the local filesystem
+
+    Args:
+        folder_id (string): ID of the Drive folder to access
+        destination_folder (string): Folder path on source machine where
+            files are to be downloaded
+
+    Returns:
+        bool: True if successfully downloaded all files, False if not
+    """
+
     service = setup_service()
     page_token = None
     while True:
@@ -111,4 +145,6 @@ def download_files_in_folder(folder_id, destination_folder = ""):
                 break
         except errors.HttpError, error:
             print 'An error occurred: %s' % error
-            break
+            return False
+
+    return True

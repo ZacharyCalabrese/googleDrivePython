@@ -1,4 +1,4 @@
-# GoogleDrive
+# GoogleDrivePython
 
 ### Usage
 To connect with Google Drive using Python you will need to activate the Google Drive API. Instructions for that can be found here: https://developers.google.com/drive/web/quickstart/python
