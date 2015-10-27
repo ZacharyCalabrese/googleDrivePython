@@ -3,6 +3,7 @@ import os
 import oauth2client
 
 from apiclient import errors, http, discovery
+from apiclient.http import MediaFileUpload
 from oauth2client import client, tools
 import config
 
@@ -192,13 +193,14 @@ def get_parent_id(service, file_id):
         print 'An error occur %s' % error
         return None
 
-def move_file_to_folder(file_id, new_folder_id):
+def move_file_to_folder(file_id, new_folder_id = "root"):
     """
     Transfer file to a new folder
 
     Args:
         file_id (string): ID of the file to be moved
-        folder_id (string): ID of the folder where file is to be moved
+        folder_id (string): ID of the folder where file is to be moved;
+            leave blank to move to base folder
 
     Returns:
         bool: True if successfully moves, False if not
@@ -216,6 +218,46 @@ def move_file_to_folder(file_id, new_folder_id):
     except errors.HttpError, error: 
         print 'An error occur: %s' % error
         return False
+
+def push_file_to_drive(file_path, file_title, description = "", destination_folder = "root"):
+    """
+    Upload a file from local machine to Google Drive.  Include folder ID or leave
+    as is to upload to root directory on Google Drive
+
+    MAX File Size: 5120GB
+
+    Args:
+        file_path (string): Absolute path of file on machine to upload
+        file_title (string): Title of uploaded file, including extension
+        description (string): Description of uploaded file
+        destination_folder (string): ID of folder on Google Drive
+
+    Returns:
+        bool: True if successfully uploaded, False if not
+    """
+
+    service = setup_service()
+    media_body = MediaFileUpload(file_path, mimetype='[*/*]', resumable=True)
+    body = {
+            'title':file_title,
+            'description':description,
+            'parents':destination_folder,
+            'mimeType':'[*/*]'
+            }
+
+    try:
+        file = service.files().insert(body=body,media_body=media_body).execute()
+        print 'File uploaded successfuly'
+        return True
+    except errors.HttpError, error:
+        print 'An error occured: %s' % error
+        return False
+
+
+
+
+
+
 
 
 
