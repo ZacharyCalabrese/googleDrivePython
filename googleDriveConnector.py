@@ -59,6 +59,27 @@ def setup_service():
     service = discovery.build('drive', 'v2', http=http)
     return service
 
+def delete_file(file_id):
+    """
+    Deletes a file from Google Drive
+
+    Args:
+        file_id (string): Id of file to be deleted
+
+    Returns:
+        bool: True if successfully deleted, False if not
+    """
+
+    service = setup_service()
+
+    try:
+        service.files().delete(fileId=file_id).execute()
+        print 'File %s deleted successfully' % file_id
+        return True
+    except errors.HttpError, error:
+        print 'An error occurred: %s' % error
+        return False
+    
 def get_filename(service, file_id):
     """
     Return the title of the referenced file as it appears on Google Drive
@@ -69,7 +90,7 @@ def get_filename(service, file_id):
 
     Returns:
         title (string): String version of file title
-        None: If and error occurs on fetching file title
+        None: If an error occurs on fetching file title
     """
 
     try:
@@ -148,3 +169,59 @@ def download_files_in_folder(folder_id, destination_folder = ""):
             return False
 
     return True
+
+def get_parent_id(service, file_id):
+    """
+    Get the ID of the parent folder for the specified file
+
+    Args:
+        service: Service instance
+        file_id (string): ID of the file for parent lookup
+    
+    Returns:
+        parent_id (string): ID of parent folder
+        None: If an error occurs
+
+    """
+
+    try:
+        parents = service.parents().list(fileId=file_id).execute()
+
+        return parents['items'][0]['id']
+    except errors.HttpError, error:
+        print 'An error occur %s' % error
+        return None
+
+def move_file_to_folder(file_id, new_folder_id):
+    """
+    Transfer file to a new folder
+
+    Args:
+        file_id (string): ID of the file to be moved
+        folder_id (string): ID of the folder where file is to be moved
+
+    Returns:
+        bool: True if successfully moves, False if not
+    """
+   
+    service = setup_service()
+    new_parent = {'id': new_folder_id}
+    old_parent = get_parent_id(service, file_id)
+
+    try:
+        service.parents().insert(fileId=file_id, body=new_parent).execute()
+        service.parents().delete(fileId=file_id, parentId=old_parent).execute()
+        print 'File %s successfully moved' % file_id
+        return True
+    except errors.HttpError, error: 
+        print 'An error occur: %s' % error
+        return False
+
+
+
+
+
+
+
+
+
